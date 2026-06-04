@@ -1,0 +1,8 @@
+/* Page-specific tweaks for bookings page */
+.dashboard-root h1 {
+    font-size: 1.4rem;
+}
+
+.table-responsive {
+    min-width: 0;
+}

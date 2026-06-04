@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Bronlar - Sayohat Admin</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+    <link rel="stylesheet" href="bookings.css" />
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="container">
+                <div class="brand">Sayohat Admin</div>
+                <nav>
+                    <ul class="sidebar-nav">
+                        <li><a class="btn-link" href="dashboard.html">Dashbord</a></li>
+                        <li><a class="btn-link" href="clients.html">Mijozlar</a></li>
+                        <li><a class="btn-link" href="packages.html">Paketlar</a></li>
+                        <li><a class="btn-link active-link" href="bookings.html">Bronlar</a></li>
+                        <li><a class="btn-link" href="index.html">SAYTGA QAYTISH</a></li>
+                    </ul>
+                </nav>
+                <div class="sidebar-footer"><button id="logout" class="btn btn-secondary">Chiqish</button></div>
+            </div>
+        </aside>
+
+        <main class="dashboard-root">
+            <div class="container">
+                <header class="dashboard-header">
+                    <div>
+                        <h1>Bronlar</h1>
+                        <p class="small-text">Bronlar ro'yxati va holatini boshqarish</p>
+                    </div>
+                </header>
+
+                <section>
+                    <div class="panel-actions">
+                        <button id="add-booking" class="btn btn-primary">Bron qo'shish</button>
+                    </div>
+                    <div id="bookings-list" class="table-responsive"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="edit-title">Elementni tahrirlash</h3>
+                <button id="close-edit-modal" class="close-btn">×</button>
+            </div>
+            <div class="modal-body" id="edit-body"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

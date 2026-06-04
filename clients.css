@@ -1,0 +1,12 @@
+/* Page-specific tweaks for clients page */
+.dashboard-root h1 {
+    font-size: 1.4rem;
+}
+
+.table-responsive {
+    background: transparent;
+}
+
+.panel-actions {
+    margin-bottom: 1rem;
+}

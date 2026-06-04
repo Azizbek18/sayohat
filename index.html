@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sayohat Agentligi Boshqaruv Tizimi</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <div class="brand">Sayohat</div>
+            <nav class="nav-links">
+                <a href="#home">Bosh sahifa</a>
+                <a href="#packages">Paketlar</a>
+                <a href="#destinations">Yo'nalishlar</a>
+                <a href="#dashboard">Xodim</a>
+            </nav>
+            <button id="open-login" class="btn btn-primary">Kirish</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="container landing-grid">
+                <article class="hero-card">
+                    <span class="eyebrow">Sayohat Agentligi</span>
+                    <h1>Eng yaxshi tur paketlari va mijozlarni boshqarish tizimi</h1>
+                    <p>Sayohat paketlarini, mijozlar va bron qilingan yo'nalishlarni nazorat qilish uchun qulay va ko'p
+                        funksiyali tizim.</p>
+                    <div class="hero-actions">
+                        <button id="open-register" class="btn btn-secondary">Xodim ro'yxatdan o'tishi</button>
+                        <a href="#packages" class="btn btn-primary btn-link">Paketlar ko'rish</a>
+                    </div>
+                </article>
+                <article class="card mini-card">
+                    <h3>To'liq boshqaruv</h3>
+                    <p>Mijozlar, paketlar va bronlarni bitta joydan boshqaring.</p>
+                </article>
+                <article class="card mini-card">
+                    <h3>Populyar yo'nalishlar</h3>
+                    <p>Ommabop sayohat yo'nalishlari avtomatik tarzda chiqariladi.</p>
+                </article>
+                <article class="card mini-card">
+                    <h3>Ro'yhatdan o'tish</h3>
+                    <p>Xodimlar ro'yxatdan o'tishi va o'z boshqaruv paneliga kirishi mumkin.</p>
+                </article>
+                <article class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80"
+                        alt="Travel" />
+                </article>
+            </div>
+        </section>
+
+        <section class="packages" id="packages">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <span class="eyebrow">Tur paketlari</span>
+                        <h2>Eng yaxshi paketlar</h2>
+                    </div>
+                </div>
+                <div id="package-list" class="grid"></div>
+            </div>
+        </section>
+
+        <section class="popular-destinations" id="destinations">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <span class="eyebrow">Yo'nalishlar</span>
+                        <h2>Eng ommabop yo'nalishlar</h2>
+                    </div>
+                </div>
+                <div id="destination-list" class="grid"></div>
+            </div>
+        </section>
+
+        <section class="dashboard" id="dashboard">
+            <div class="container section-header">
+                <div>
+                    <span class="eyebrow">Xodim paneli</span>
+                    <h2>Ma'lumotlarni boshqarish</h2>
+                </div>
+            </div>
+            <div class="container">
+                <div class="dashboard-instructions">
+                    <p>Xodim sifatida tizimga kirish orqali mijozlar, paketlar va bronlarni boshqarishingiz mumkin.</p>
+                </div>
+                <div class="dashboard-cards">
+                    <article class="dashboard-card">
+                        <h3>Ro'yxatdan o'tish</h3>
+                        <p>Yangi xodim sifatida tizimga qayd etiling.</p>
+                        <button id="open-register-2" class="btn btn-secondary">Ro'yxatdan o'tish</button>
+                    </article>
+                    <article class="dashboard-card">
+                        <h3>Kirish</h3>
+                        <p>Mavjud xodimlar o'z ma'lumotlari va boshqaruv paneliga kirishi mumkin.</p>
+                        <button id="open-login-2" class="btn btn-primary">Kirish</button>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>&copy; 2026 Sayohat Agentligi. Barcha huquqlar himoyalangan.</p>
+            <p>Web dastur HTML, CSS va JavaScript yordamida ishlab chiqildi.</p>
+        </div>
+    </footer>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Kirish</h3>
+                <button id="close-modal" class="close-btn">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="auth-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="employee-name">Ismingiz</label>
+                        <input type="text" id="employee-name" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-email">Email</label>
+                        <input type="email" id="employee-email" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-password">Parol</label>
+                        <input type="password" id="employee-password" required minlength="6" />
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="fill-demo" class="btn btn-secondary">Demo to'ldirish</button>
+                        <button type="submit" class="btn btn-primary">Yuborish</button>
+                    </div>
+                    <p id="auth-help" class="auth-help"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="edit-title">Elementni tahrirlash</h3>
+                <button id="close-edit-modal" class="close-btn">×</button>
+            </div>
+            <div class="modal-body" id="edit-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,8 @@
+/* Page-specific tweaks for packages page */
+.dashboard-root h1 {
+    font-size: 1.4rem;
+}
+
+.package-card {
+    margin-bottom: 0.75rem;
+}
