@@ -3,14 +3,15 @@ const clientsKey = "sayohat_clients";
 const packagesKey = "sayohat_packages";
 const bookingsKey = "sayohat_bookings";
 
+function getDestinationImage(destinationName) {
+    return "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg";
+}
+
 const openLoginBtns = [
     document.getElementById("open-login"),
     document.getElementById("open-login-2"),
 ];
-const openRegisterBtns = [
-    document.getElementById("open-register"),
-    document.getElementById("open-register-2"),
-];
+const openRegisterBtns = [document.getElementById("open-register-2")];
 const modal = document.getElementById("modal");
 const closeModal = document.getElementById("close-modal");
 const modalTitle = document.getElementById("modal-title");
@@ -63,12 +64,21 @@ function getClients() {
     return readStorage(clientsKey, []);
 }
 
+const initialPackages = [
+    { id: "p1", name: "Bali Dam olish", price: 259, duration: "7 kun", description: "Quyosh, dengiz va dam olish paketini o'z ichiga oladi.", destination: "Bali", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p2", name: "Istanbul sayohati", price: 179, duration: "5 kun", description: "Madaniyat, tarixiy sayyohlik va maxsus tur paket.", destination: "Istanbul", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p3", name: "Dubay hashamati", price: 299, duration: "6 kun", description: "Lyuks shaharda sayohat, savdo markazlari va qulay yashash.", destination: "Dubay", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p4", name: "Parij Romantikasi", price: 450, duration: "4 kun", description: "Eyxel minorasi, Luvr muzeyi va romantik kechki ovqat.", destination: "Fransiya", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p5", name: "Toshkent - Samarqand", price: 80, duration: "3 kun", description: "O'zbekistonning tarixiy shaharlariga sayohat.", destination: "O'zbekiston", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p6", name: "Maldiv orollari", price: 800, duration: "10 kun", description: "Okean o'rtasida unutilmas dam olish.", destination: "Maldiv", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p7", name: "Misr ehromlari", price: 320, duration: "6 kun", description: "Qadimgi tarix va Qizil dengiz bo'yida hordiq.", destination: "Misr", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p8", name: "Antalya All Inclusive", price: 550, duration: "7 kun", description: "O'rta yer dengizi sohilida besh yulduzli dam olish.", destination: "Turkiya", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p9", name: "Samarqand Marvaridi", price: 120, duration: "4 kun", description: "Registon maydoni, Go'ri Amir va qadimiy obidalar bo'ylab sayohat.", destination: "O'zbekiston", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" },
+    { id: "p10", name: "Rim - Abadiy Shahar", price: 380, duration: "5 kun", description: "Kolizey, Rim forumi va Italiyaning mazali oshxonasi.", destination: "Italiya", imageUrl: "https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" }
+];
+
 function getPackages() {
-    return readStorage(packagesKey, [
-        { id: "p1", name: "Bali Dam olish", price: 259, duration: "7 kun", description: "Quyosh, dengiz va dam olish paketini o'z ichiga oladi.", destination: "Bali" },
-        { id: "p2", name: "Istanbul sayohati", price: 179, duration: "5 kun", description: "Madaniyat, tarixiy sayyohlik va maxsus tur paket.", destination: "Istanbul" },
-        { id: "p3", name: "Dubay hashamati", price: 299, duration: "6 kun", description: "Lyuks shaharda sayohat, savdo markazlari va qulay yashash.", destination: "Dubay" },
-    ]);
+    return readStorage(packagesKey, initialPackages);
 }
 
 function getBookings() {
@@ -161,6 +171,8 @@ function setActiveTab(tabId) {
 function getPopularDestinations() {
     const bookings = getBookings();
     const packages = getPackages();
+    
+    // Bronlar asosida hisoblash
     const counts = bookings.reduce((acc, booking) => {
         const pkg = getPackageById(booking.packageId);
         if (pkg) {
@@ -168,9 +180,17 @@ function getPopularDestinations() {
         }
         return acc;
     }, {});
-    return Object.entries(counts)
+    let popular = Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
         .map(([destination, count]) => ({ destination, count }));
+
+    // Agar bronlar yo'q bo'lsa, paketlardan bir nechtasini ko'rsatamiz
+    if (popular.length === 0) {
+        const uniqueDestinations = [...new Set(packages.map(p => p.destination))];
+        popular = uniqueDestinations.slice(0, 3).map(dest => ({ destination: dest, count: 0 }));
+    }
+
+    return popular;
 }
 
 function renderPackages() {
@@ -180,10 +200,18 @@ function renderPackages() {
         .map(
             (pkg) => `
       <article class="package-card">
-        <h3>${pkg.name}</h3>
-        <p class="small-text">${pkg.destination} · ${pkg.duration}</p>
-        <p>${pkg.description}</p>
-        <p class="small-text"><strong>Narxi:</strong> $${pkg.price}</p>
+        <div class="package-card-image">
+            <img src="${pkg.imageUrl || 'https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg'}" alt="${pkg.name}">
+        </div>
+        <div class="package-card-content">
+            <h3>${pkg.name}</h3>
+            <p class="small-text">${pkg.destination} · ${pkg.duration}</p>
+            <p>${pkg.description}</p>
+            <div class="package-card-footer">
+                <p class="package-price"><strong>$${pkg.price}</strong></p>
+                <button class="btn btn-primary btn-sm book-now-btn" data-id="${pkg.id}">Bron qilish</button>
+            </div>
+        </div>
       </article>`
         )
         .join("");
@@ -191,20 +219,20 @@ function renderPackages() {
 
 function renderDestinations() {
     if (!destinationListEl) return;
-    const popular = getPopularDestinations();
-    const fallback = [
-        { destination: "Parij", count: 0 },
-        { destination: "Toshkent", count: 0 },
-        { destination: "Maldivlar", count: 0 },
-    ];
-    const list = popular.length ? popular : fallback;
+    const list = getPopularDestinations();
+    
     destinationListEl.innerHTML = list
         .map(
             (item) => `
       <article class="destination-card">
-        <h3>${item.destination}</h3>
-        <p class="small-text">Bronlar soni: ${item.count}</p>
-        <p>Bu yo'nalish mijozlar orasida juda mashhur.</p>
+        <div class="destination-card-image">
+            <img src="${getDestinationImage(item.destination)}" alt="${item.destination}">
+        </div>
+        <div class="destination-card-content">
+            <h3>${item.destination}</h3>
+            <p class="small-text">Bronlar soni: ${item.count}</p>
+            <p>Bu yo'nalish mijozlar orasida juda mashhur.</p>
+        </div>
       </article>`
         )
         .join("");
@@ -509,8 +537,9 @@ function setupInitialData() {
         existingEmployees.push({ id: "e_demo", name: "demo", email: demoEmail, password: demoPassword });
     }
     writeStorage(employeesKey, existingEmployees);
-    if (!localStorage.getItem(packagesKey)) {
-        writeStorage(packagesKey, getPackages());
+    // Agar paketlar soni 10 tadan kam bo'lsa (eski ma'lumot), yangilaymiz
+    if (!localStorage.getItem(packagesKey) || getPackages().length < 10) {
+        writeStorage(packagesKey, initialPackages);
     }
     if (!localStorage.getItem(clientsKey)) {
         writeStorage(clientsKey, [
@@ -661,5 +690,105 @@ if (bookingsListEl) bookingsListEl.addEventListener("click", (event) => {
 tabButtons.forEach((button) => {
     button.addEventListener("click", () => setActiveTab(button.dataset.tab));
 });
+
+// Mobile Menu Toggle Logic
+const menuToggle = document.getElementById("menu-toggle");
+const navLinksContainer = document.querySelector(".nav-links");
+
+if (menuToggle && navLinksContainer) {
+    menuToggle.addEventListener("click", () => {
+        const isActive = menuToggle.classList.toggle("active");
+        navLinksContainer.classList.toggle("active");
+        // Menyuda scroll bo'lmasligi uchun body'ni muzlatamiz
+        document.body.style.overflow = isActive ? "hidden" : "";
+    });
+
+    // Havolani bosganda menyu yopilishi uchun
+    navLinksContainer.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+            menuToggle.classList.remove("active");
+            navLinksContainer.classList.remove("active");
+            document.body.style.overflow = "";
+        });
+    });
+}
+
+// Mijoz bron qilish logikasi
+if (packageListEl) {
+    packageListEl.addEventListener("click", (e) => {
+        if (e.target.classList.contains("book-now-btn")) {
+            const pkgId = e.target.dataset.id;
+            const pkg = getPackageById(pkgId);
+            showBookingModal(pkg);
+        }
+    });
+}
+
+function showBookingModal(pkg) {
+    authState.mode = "booking";
+    modal.classList.remove("hidden");
+    modalTitle.textContent = `${pkg.name} - Bron qilish`;
+    authHelp.textContent = "Iltimos, ma'lumotlaringizni kiriting va biz siz bilan bog'lanamiz.";
+    authForm.dataset.packageId = pkg.id;
+}
+
+const searchBookingsBtn = document.getElementById("search-bookings-btn");
+const checkEmailInput = document.getElementById("check-email");
+const resultsEl = document.getElementById("my-bookings-results");
+
+if (searchBookingsBtn) {
+    searchBookingsBtn.addEventListener("click", () => {
+        const email = checkEmailInput.value.trim().toLowerCase();
+        if (!email) return alert("Emailni kiriting");
+
+        const clients = getClients();
+        const client = clients.find(c => c.email === email);
+
+        if (!client) {
+            resultsEl.innerHTML = "<p>Bu email bilan bron topilmadi.</p>";
+            return;
+        }
+
+        const bookings = getBookings().filter(b => b.clientId === client.id);
+        if (bookings.length === 0) {
+            resultsEl.innerHTML = "<p>Sizda hali bronlar yo'q.</p>";
+            return;
+        }
+
+        resultsEl.innerHTML = bookings.map(b => {
+            const pkg = getPackageById(b.packageId) || { name: "Noma'lum", price: 0, duration: 'Noma\'lum' };
+            const statusClass = b.status === 'Tasdiqlangan' ? 'status-confirmed' : 
+                               b.status === 'Rad etilgan' ? 'status-rejected' : 'status-pending';
+            return `
+                <article class="card booking-result-card ${statusClass}">
+                    <div class="booking-result-content">
+                        <div class="booking-info">
+                            <span class="status-badge">${b.status}</span>
+                            <h3>${pkg.name}</h3>
+                            <div class="booking-meta">
+                                <span>📅 ${pkg.duration}</span>
+                                <span>💰 $${pkg.price}</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-link delete-booking-btn" data-id="${b.id}">❌ Bekor qilish</button>
+                    </div>
+                </article>
+            `;
+        }).join("");
+    });
+}
+
+if (resultsEl) {
+    resultsEl.addEventListener("click", (e) => {
+        if (e.target.classList.contains("delete-booking-btn")) {
+            const id = e.target.dataset.id;
+            if (confirm("Bronni bekor qilishni xohlaysizmi?")) {
+                const bookings = getBookings().filter(b => b.id !== id);
+                writeStorage(bookingsKey, bookings);
+                searchBookingsBtn.click(); // Listni yangilash
+            }
+        }
+    });
+}
 
 init();

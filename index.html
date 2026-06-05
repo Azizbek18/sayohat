@@ -12,13 +12,21 @@
     <header class="site-header">
         <div class="container header-inner">
             <div class="brand">Sayohat</div>
-            <nav class="nav-links">
-                <a href="#home">Bosh sahifa</a>
-                <a href="#packages">Paketlar</a>
-                <a href="#destinations">Yo'nalishlar</a>
-                <a href="#dashboard">Xodim</a>
-            </nav>
-            <button id="open-login" class="btn btn-primary">Kirish</button>
+            <div class="header-actions">
+                <nav class="nav-links">
+                    <a href="#home">Bosh sahifa</a>
+                    <a href="#packages">Paketlar</a>
+                    <a href="#destinations">Yo'nalishlar</a>
+                    <a href="#my-bookings">Mening bronlarim</a>
+                </nav>
+                <button id="open-login" class="btn btn-primary">Kirish</button>
+                <!-- Burger Menu Tugmasi -->
+                <button id="menu-toggle" class="menu-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -27,12 +35,11 @@
             <div class="container landing-grid">
                 <article class="hero-card">
                     <span class="eyebrow">Sayohat Agentligi</span>
-                    <h1>Eng yaxshi tur paketlari va mijozlarni boshqarish tizimi</h1>
-                    <p>Sayohat paketlarini, mijozlar va bron qilingan yo'nalishlarni nazorat qilish uchun qulay va ko'p
-                        funksiyali tizim.</p>
+                    <h1>Dunyo bo'ylab unutilmas sayohatlarni biz bilan boshlang</h1>
+                    <p>Eng sara tur paketlar, hamyonbop narxlar va ishonchli xizmat. O'zingizga mos turni tanlang va onlayn bron qiling.</p>
                     <div class="hero-actions">
-                        <button id="open-register" class="btn btn-secondary">Xodim ro'yxatdan o'tishi</button>
-                        <a href="#packages" class="btn btn-primary btn-link">Paketlar ko'rish</a>
+                        <a href="#packages" class="btn btn-primary">Hozir bron qilish</a>
+                        <a href="#my-bookings" class="btn btn-secondary">Bronni tekshirish</a>
                     </div>
                 </article>
                 <article class="card mini-card">
@@ -48,8 +55,7 @@
                     <p>Xodimlar ro'yxatdan o'tishi va o'z boshqaruv paneliga kirishi mumkin.</p>
                 </article>
                 <article class="hero-image">
-                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80"
-                        alt="Travel" />
+                    <img src="https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" alt="Travel" />
                 </article>
             </div>
         </section>
@@ -78,30 +84,36 @@
             </div>
         </section>
 
-        <section class="dashboard" id="dashboard">
+        <section class="dashboard" id="my-bookings">
             <div class="container section-header">
                 <div>
-                    <span class="eyebrow">Xodim paneli</span>
-                    <h2>Ma'lumotlarni boshqarish</h2>
+                    <span class="eyebrow">Mijozlar uchun</span>
+                    <h2>Bronlaringizni tekshiring</h2>
                 </div>
             </div>
             <div class="container">
-                <div class="dashboard-instructions">
-                    <p>Xodim sifatida tizimga kirish orqali mijozlar, paketlar va bronlarni boshqarishingiz mumkin.</p>
+                <div class="search-card card">
+                    <div class="search-header">
+                        <h3>Bronlaringizni toping</h3>
+                        <p>Bron holatini ko'rish yoki uni bekor qilish uchun tizimga kiritilgan email manzilingizni kiriting.</p>
+                    </div>
+                    <div class="booking-search-form">
+                        <input type="email" id="check-email" class="search-input" placeholder="Email manzilingizni yozing..." />
+                        <button id="search-bookings-btn" class="btn btn-primary">Bronlarni qidirish</button>
+                    </div>
                 </div>
-                <div class="dashboard-cards">
-                    <article class="dashboard-card">
-                        <h3>Ro'yxatdan o'tish</h3>
-                        <p>Yangi xodim sifatida tizimga qayd etiling.</p>
-                        <button id="open-register-2" class="btn btn-secondary">Ro'yxatdan o'tish</button>
-                    </article>
-                    <article class="dashboard-card">
-                        <h3>Kirish</h3>
-                        <p>Mavjud xodimlar o'z ma'lumotlari va boshqaruv paneliga kirishi mumkin.</p>
-                        <button id="open-login-2" class="btn btn-primary">Kirish</button>
-                    </article>
+                <div id="my-bookings-results" class="grid">
+                    <!-- Qidiruv natijalari shu yerda chiqadi -->
                 </div>
             </div>
+        </section>
+
+        <!-- Admin qismi faqat xodimlar uchun, pastroqqa tushirildi yoki yashirildi -->
+        <section class="dashboard admin-section" id="admin-section">
+             <div class="container admin-container">
+                <p class="small-text">Siz agentlik xodimimisiz?</p>
+                <button id="open-login-2" class="btn btn-link">Admin panelga kirish</button>
+             </div>
         </section>
     </main>
 
