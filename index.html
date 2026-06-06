@@ -6,20 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sayohat Agentligi</title>
     <link rel="stylesheet" href="styles.css" />
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     <header class="site-header">
         <div class="container header-inner">
-            <div class="brand">Sayohat</div>
+            <div class="brand" data-i18n="logo_text">Sayohat</div>
             <div class="header-actions">
                 <nav class="nav-links">
-                    <a href="#home">Bosh sahifa</a>
-                    <a href="#packages">Paketlar</a>
-                    <a href="#destinations">Yo'nalishlar</a>
-                    <a href="#my-bookings">Mening bronlarim</a>
+                    <a href="#home" data-i18n="nav_home">Bosh sahifa</a>
+                    <a href="#packages" data-i18n="nav_packages">Paketlar</a>
+                    <a href="#destinations" data-i18n="nav_destinations">Yo'nalishlar</a>
+                    <a href="#my-bookings" data-i18n="nav_my_bookings">Mening bronlarim</a>
                 </nav>
-                <button id="open-login" class="btn btn-primary">Kirish</button>
+                <div class="lang-switcher">
+                    <select id="lang-select" class="lang-select">
+                        <option value="uz">🇺🇿 UZ</option>
+                        <option value="ru">🇷🇺 RU</option>
+                        <option value="en">🇺🇸 EN</option>
+                    </select>
+                </div>
+                <button id="open-login" class="btn btn-primary" data-i18n="btn_login">Kirish</button>
                 <!-- Burger Menu Tugmasi -->
                 <button id="menu-toggle" class="menu-toggle" aria-label="Menu">
                     <span></span>
@@ -34,28 +43,31 @@
         <section class="hero" id="home">
             <div class="container landing-grid">
                 <article class="hero-card">
-                    <span class="eyebrow">Sayohat Agentligi</span>
-                    <h1>Dunyo bo'ylab unutilmas sayohatlarni biz bilan boshlang</h1>
-                    <p>Eng sara tur paketlar, hamyonbop narxlar va ishonchli xizmat. O'zingizga mos turni tanlang va onlayn bron qiling.</p>
+                    <span class="eyebrow" data-i18n="hero_eyebrow">Sayohat Agentligi</span>
+                    <h1 data-i18n="hero_h1">Dunyo bo'ylab unutilmas sayohatlarni biz bilan boshlang</h1>
+                    <p data-i18n="hero_p">Eng sara tur paketlar, hamyonbop narxlar va ishonchli xizmat. O'zingizga mos
+                        turni tanlang va onlayn bron qiling.</p>
                     <div class="hero-actions">
-                        <a href="#packages" class="btn btn-primary">Hozir bron qilish</a>
-                        <a href="#my-bookings" class="btn btn-secondary">Bronni tekshirish</a>
+                        <a href="#packages" class="btn btn-primary" data-i18n="hero_btn_book">Hozir bron qilish</a>
+                        <a href="#my-bookings" class="btn btn-secondary" data-i18n="hero_btn_check">Bronni
+                            tekshirish</a>
                     </div>
                 </article>
                 <article class="card mini-card">
-                    <h3>To'liq boshqaruv</h3>
-                    <p>Mijozlar, paketlar va bronlarni bitta joydan boshqaring.</p>
+                    <h3 data-i18n="mini_mgmt_h3">To'liq boshqaruv</h3>
+                    <p data-i18n="mini_mgmt_p">Mijozlar, paketlar va bronlarni bitta joydan boshqaring.</p>
                 </article>
                 <article class="card mini-card">
-                    <h3>Ommabop yo'nalishlar</h3>
-                    <p>Ommabop sayohat yo'nalishlari avtomatik tarzda chiqariladi.</p>
+                    <h3 data-i18n="mini_dest_h3">Ommabop yo'nalishlar</h3>
+                    <p data-i18n="mini_dest_p">Ommabop sayohat yo'nalishlari avtomatik tarzda chiqariladi.</p>
                 </article>
                 <article class="card mini-card">
-                    <h3>Ro'yxatdan o'tish</h3>
-                    <p>Xodimlar ro'yxatdan o'tishi va o'z boshqaruv paneliga kirishi mumkin.</p>
+                    <h3 data-i18n="mini_reg_h3">Ro'yxatdan o'tish</h3>
+                    <p data-i18n="mini_reg_p">Xodimlar ro'yxatdan o'tishi va o'z boshqaruv paneliga kirishi mumkin.</p>
                 </article>
                 <article class="hero-image">
-                    <img src="https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg" alt="Travel" />
+                    <img src="https://uzbekistan.travel/storage/app/media/Rasmlar/Samarqand/umumiy/cropped-images/shutterstock_1401921575-0-0-0-0-1738745845.jpg"
+                        alt="Travel" />
                 </article>
             </div>
         </section>
@@ -64,8 +76,8 @@
             <div class="container">
                 <div class="section-header">
                     <div>
-                        <span class="eyebrow">Tur paketlari</span>
-                        <h2>Eng yaxshi paketlar</h2>
+                        <span class="eyebrow" data-i18n="pkgs_eyebrow">Tur paketlari</span>
+                        <h2 data-i18n="pkgs_h2">Eng yaxshi paketlar</h2>
                     </div>
                 </div>
                 <div id="package-list" class="grid"></div>
@@ -76,8 +88,8 @@
             <div class="container">
                 <div class="section-header">
                     <div>
-                        <span class="eyebrow">Yo'nalishlar</span>
-                        <h2>Eng ommabop yo'nalishlar</h2>
+                        <span class="eyebrow" data-i18n="dests_eyebrow">Yo'nalishlar</span>
+                        <h2 data-i18n="dests_h2">Eng ommabop yo'nalishlar</h2>
                     </div>
                 </div>
                 <div id="destination-list" class="grid"></div>
@@ -87,19 +99,22 @@
         <section class="dashboard" id="my-bookings">
             <div class="container section-header">
                 <div>
-                    <span class="eyebrow">Mijozlar uchun</span>
-                    <h2>Bronlaringizni tekshiring</h2>
+                    <span class="eyebrow" data-i18n="check_eyebrow">Mijozlar uchun</span>
+                    <h2 data-i18n="check_h2">Bronlaringizni tekshiring</h2>
                 </div>
             </div>
             <div class="container">
                 <div class="search-card card">
                     <div class="search-header">
-                        <h3>Bronlaringizni toping</h3>
-                        <p>Bron holatini ko'rish yoki uni bekor qilish uchun tizimga kiritilgan email manzilingizni kiriting.</p>
+                        <h3 data-i18n="check_search_h3">Bronlaringizni toping</h3>
+                        <p data-i18n="check_search_p">Bron holatini ko'rish yoki uni bekor qilish uchun tizimga
+                            kiritilgan email manzilingizni kiriting.</p>
                     </div>
                     <div class="booking-search-form">
-                        <input type="email" id="check-email" class="search-input" placeholder="Email manzilingizni yozing..." />
-                        <button id="search-bookings-btn" class="btn btn-primary">Bronlarni qidirish</button>
+                        <input type="email" id="check-email" class="search-input"
+                            placeholder="Email manzilingizni yozing..." />
+                        <button id="search-bookings-btn" class="btn btn-primary" data-i18n="check_btn">Bronlarni
+                            qidirish</button>
                     </div>
                 </div>
                 <div id="my-bookings-results" class="grid">
@@ -110,38 +125,38 @@
 
         <!-- Admin qismi faqat xodimlar uchun, pastroqqa tushirildi yoki yashirildi -->
         <section class="dashboard admin-section" id="admin-section">
-             <div class="container admin-container">
-                <p class="small-text">Siz agentlik xodimimisiz?</p>
-                <button id="open-login-2" class="btn btn-link">Admin panelga kirish</button>
-             </div>
+            <div class="container admin-container">
+                <p class="small-text" data-i18n="admin_p">Siz agentlik xodimimisiz?</p>
+                <button id="open-login-2" class="btn btn-link" data-i18n="admin_btn">Admin panelga kirish</button>
+            </div>
         </section>
     </main>
 
     <footer class="site-footer">
         <div class="container footer-inner">
-            <p>&copy; 2026 Sayohat Agentligi. Barcha huquqlar himoyalangan.</p>
-            <p>Web dastur HTML, CSS va JavaScript yordamida ishlab chiqildi.</p>
+            <p data-i18n="footer_copy">&copy; 2026 Sayohat Agentligi. Barcha huquqlar himoyalangan.</p>
+            <p data-i18n="footer_dev">Web dastur HTML, CSS va JavaScript yordamida ishlab chiqildi.</p>
         </div>
     </footer>
 
     <div id="modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modal-title">Kirish</h3>
+                <h3 id="modal-title" data-i18n="modal_login">Kirish</h3>
                 <button id="close-modal" class="close-btn">×</button>
             </div>
             <div class="modal-body">
                 <form id="auth-form" class="auth-form">
                     <div class="form-group">
-                        <label for="employee-name">Ismingiz</label>
+                        <label for="employee-name" data-i18n="label_name">Ismingiz</label>
                         <input type="text" id="employee-name" required />
                     </div>
                     <div class="form-group">
-                        <label for="employee-email">Email</label>
+                        <label for="employee-email" data-i18n="label_email">Email</label>
                         <input type="email" id="employee-email" required />
                     </div>
                     <div class="form-group">
-                        <label for="employee-password">Parol</label>
+                        <label for="employee-password" data-i18n="label_password">Parol</label>
                         <input type="password" id="employee-password" required minlength="6" />
                     </div>
                     <div class="form-actions">
@@ -157,7 +172,7 @@
     <div id="edit-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="edit-title">Elementni tahrirlash</h3>
+                <h3 id="edit-title" data-i18n="modal_edit">Elementni tahrirlash</h3>
                 <button id="close-edit-modal" class="close-btn">×</button>
             </div>
             <div class="modal-body" id="edit-body"></div>

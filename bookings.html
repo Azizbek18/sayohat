@@ -8,13 +8,15 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="admin.css" />
     <link rel="stylesheet" href="bookings.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
     <div class="app-shell">
         <aside class="sidebar">
             <div class="sidebar-brand-block">
-                <div class="brand">Sayohat Admin</div>
+                <div class="brand" data-i18n="logo_admin">Sayohat Admin</div>
                 <p class="small-text sidebar-tagline">Bronlar holati va jarayonlar boshqaruvi</p>
             </div>
             <div class="sidebar-nav-block">
@@ -46,10 +48,12 @@
                     <div class="dashboard-hero-copy">
                         <span class="eyebrow">Bookings overview</span>
                         <h1>Bronlar</h1>
-                        <p class="small-text">Bron holati, tasdiqlash jarayoni va mijozlar harakati shu yerda boshqariladi.</p>
+                        <p class="small-text">Bron holati, tasdiqlash jarayoni va mijozlar harakati shu yerda
+                            boshqariladi.</p>
                         <div class="dashboard-tools">
                             <button id="add-booking" class="btn btn-primary">Bron qo'shish</button>
-                            <button id="dashboard-new-booking" class="btn btn-secondary" type="button">Tezkor bron</button>
+                            <button id="dashboard-new-booking" class="btn btn-secondary" type="button">Tezkor
+                                bron</button>
                         </div>
                     </div>
                     <div class="dashboard-hero-stats">
@@ -123,7 +127,8 @@
                         </div>
                         <div class="insight-box">
                             <h3>Jarayonni kuzatish</h3>
-                            <p class="small-text">Har bir bronni tahrirlash, tasdiqlash yoki bekor qilish uchun shu paneldan foydalaning.</p>
+                            <p class="small-text">Har bir bronni tahrirlash, tasdiqlash yoki bekor qilish uchun shu
+                                paneldan foydalaning.</p>
                         </div>
                     </article>
                 </section>
