@@ -9,6 +9,7 @@ Bu loyiha HTML, CSS va JavaScript yordamida yozilgan sayohat agentligi boshqaruv
 - Mijozlar, paketlar va bronlarni boshqarish paneli
 - Ommabop yo'nalishlarni ko'rsatish
 - Mahalliy `localStorage` orqali ma'lumotlarni saqlash
+- Bron qilish paytida ma'lumotlarni Supabase jadvaliga yuborish
 
 ## Ishga tushirish
 
