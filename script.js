@@ -130,7 +130,8 @@ async function saveBookingToSupabase(bookingRow) {
 
     if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || "Supabasega saqlab bo'lmadi");
+        const errorData = JSON.parse(errorText || "{}");
+        throw new Error(errorData.message || errorData.details || "Supabasega saqlab bo'lmadi");
     }
 
     return response.json();
@@ -858,8 +859,8 @@ function renderClients() {
             </thead>
             <tbody>
                 ${clients
-                    .map(
-                        (client) => `
+            .map(
+                (client) => `
                             <tr>
                                 <td>${client.name}</td>
                                 <td>${client.email}</td>
@@ -870,8 +871,8 @@ function renderClients() {
                                     <button class="btn btn-link" data-action="delete-client" data-id="${client.id}">O'chirish</button>
                                 </td>
                             </tr>`
-                    )
-                    .join("")}
+            )
+            .join("")}
             </tbody>
         </table>`;
 }
@@ -892,8 +893,8 @@ function renderPackagesDashboard() {
             </thead>
             <tbody>
                 ${packages
-                    .map(
-                        (pkg) => `
+            .map(
+                (pkg) => `
                             <tr>
                                 <td>${pkg.name}</td>
                                 <td>${pkg.destination}</td>
@@ -904,8 +905,8 @@ function renderPackagesDashboard() {
                                     <button class="btn btn-link" data-action="delete-package" data-id="${pkg.id}">O'chirish</button>
                                 </td>
                             </tr>`
-                    )
-                    .join("")}
+            )
+            .join("")}
             </tbody>
         </table>`;
 }
@@ -926,10 +927,10 @@ function renderBookings() {
             </thead>
             <tbody>
                 ${bookings
-                    .map((booking) => {
-                        const client = getClientById(booking.clientId) || { name: "Noma'lum" };
-                        const pkg = getPackageById(booking.packageId) || { name: "Noma'lum" };
-                        return `
+            .map((booking) => {
+                const client = getClientById(booking.clientId) || { name: "Noma'lum" };
+                const pkg = getPackageById(booking.packageId) || { name: "Noma'lum" };
+                return `
                             <tr>
                                 <td>${client.name}</td>
                                 <td>${pkg.name}</td>
@@ -939,8 +940,8 @@ function renderBookings() {
                                     <button class="btn btn-link" data-action="delete-booking" data-id="${booking.id}">O'chirish</button>
                                 </td>
                             </tr>`;
-                    })
-                    .join("")}
+            })
+            .join("")}
             </tbody>
         </table>`;
 }
@@ -1416,7 +1417,7 @@ if (authForm) {
                 alert("Bron muvaffaqiyatli saqlandi.");
             } catch (error) {
                 console.error("Supabase booking insert error:", error);
-                setAuthSubmitting(false, "Bronni saqlab bo'lmadi. Qayta urinib ko'ring.");
+                setAuthSubmitting(false, `Xatolik yuz berdi: ${error.message}`);
                 return;
             }
             setAuthSubmitting(false);
