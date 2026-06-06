@@ -13,34 +13,122 @@
 <body>
     <div class="app-shell">
         <aside class="sidebar">
-            <div class="container">
+            <div class="sidebar-brand-block">
                 <div class="brand">Sayohat Admin</div>
+                <p class="small-text sidebar-tagline">Mijozlar profili va aloqalar markazi</p>
+            </div>
+            <div class="sidebar-nav-block">
                 <nav>
                     <ul class="sidebar-nav">
-                        <li><a class="btn-link" href="dashboard.html">Dashbord</a></li>
+                        <li><a class="btn-link" href="dashboard.html">Dashboard</a></li>
                         <li><a class="btn-link active-link" href="clients.html">Mijozlar</a></li>
                         <li><a class="btn-link" href="packages.html">Paketlar</a></li>
                         <li><a class="btn-link" href="bookings.html">Bronlar</a></li>
-                        <li><a class="btn-link" href="index.html">SAYTGA QAYTISH</a></li>
+                        <li><a class="btn-link" href="index.html">Saytga qaytish</a></li>
                     </ul>
                 </nav>
-                <div class="sidebar-footer"><button id="logout" class="btn btn-secondary">Chiqish</button></div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="avatar avatar-large">A</div>
+                    <div>
+                        <strong id="last-user">-</strong>
+                        <p class="small-text">Faol sessiya</p>
+                    </div>
+                </div>
+                <button id="logout" class="btn btn-secondary">Chiqish</button>
             </div>
         </aside>
 
         <main class="dashboard-root">
             <div class="container">
-                <header class="dashboard-header">
-                    <div>
+                <section class="dashboard-hero card">
+                    <div class="dashboard-hero-copy">
+                        <span class="eyebrow">Clients overview</span>
                         <h1>Mijozlar</h1>
-                        <p class="small-text">Mijozlar jadvali va boshqaruvi</p>
+                        <p class="small-text">Har bir mijozning aloqa ma'lumotlari, izohlari va bron tarixi bir joyda.</p>
+                        <div class="dashboard-tools">
+                            <button id="add-client" class="btn btn-primary">Mijoz qo'shish</button>
+                            <button id="dashboard-new-booking" class="btn btn-secondary" type="button">Yangi bron</button>
+                        </div>
                     </div>
-                </header>
+                    <div class="dashboard-hero-stats">
+                        <article class="stat-tile">
+                            <span class="stat-label">Jami mijozlar</span>
+                            <strong id="clients-count">0</strong>
+                        </article>
+                        <article class="stat-tile">
+                            <span class="stat-label">Bron qilganlar</span>
+                            <strong id="clients-booked">0</strong>
+                        </article>
+                        <article class="stat-tile">
+                            <span class="stat-label">Izohli mijozlar</span>
+                            <strong id="clients-noted">0</strong>
+                        </article>
+                        <article class="stat-tile stat-tile-accent">
+                            <span class="stat-label">Oxirgi qo'shilgan</span>
+                            <strong id="latest-client">-</strong>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="dashboard-overview">
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">O'rtacha bronlar</span>
+                            <strong id="clients-average-bookings">0</strong>
+                        </div>
+                        <p class="small-text">Bir mijozga to'g'ri keladigan o'rtacha bronlar</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Faol kontaktlar</span>
+                            <strong id="clients-active-contacts">0</strong>
+                        </div>
+                        <p class="small-text">Telefon va email ma'lumotlari mavjud mijozlar</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Kuzatuvga olingan</span>
+                            <strong id="clients-with-bookings">0</strong>
+                        </div>
+                        <p class="small-text">Hozircha kamida bir marta bron qilgan mijozlar</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Eng faol</span>
+                            <strong id="top-client">-</strong>
+                        </div>
+                        <p class="small-text">Eng ko'p bron qilgan mijoz</p>
+                    </article>
+                </section>
+
+                <section class="dashboard-grid">
+                    <article class="dashboard-panel-card">
+                        <div class="section-header compact-header">
+                            <div>
+                                <span class="eyebrow">Mijozlar tahlili</span>
+                                <h2>Profil ko'rinishi</h2>
+                            </div>
+                        </div>
+                        <div id="clients-highlights" class="activity-list"></div>
+                    </article>
+
+                    <article class="dashboard-panel-card">
+                        <div class="section-header compact-header">
+                            <div>
+                                <span class="eyebrow">Tezkor eslatma</span>
+                                <h2>Aloqa holati</h2>
+                            </div>
+                        </div>
+                        <div class="insight-box">
+                            <h3>Yangilash uchun tayyor</h3>
+                            <p class="small-text">Bu sahifadan mijoz ma'lumotlarini tahrirlash, eslatma qo'shish va kerak bo'lsa bronlarini bog'lash mumkin.</p>
+                        </div>
+                    </article>
+                </section>
 
                 <section>
-                    <div class="panel-actions">
-                        <button id="add-client" class="btn btn-primary">Mijoz qo'shish</button>
-                    </div>
                     <div id="clients-list" class="table-responsive"></div>
                 </section>
             </div>

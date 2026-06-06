@@ -13,33 +13,127 @@
 <body>
     <div class="app-shell">
         <aside class="sidebar">
-            <div class="container">
+            <div class="sidebar-brand-block">
                 <div class="brand">Sayohat Admin</div>
+                <p class="small-text sidebar-tagline">Paketlar tarkibi, narx va yo'nalishlar boshqaruvi</p>
+            </div>
+            <div class="sidebar-nav-block">
                 <nav>
                     <ul class="sidebar-nav">
-                        <li><a class="btn-link" href="dashboard.html">Dashbord</a></li>
+                        <li><a class="btn-link" href="dashboard.html">Dashboard</a></li>
                         <li><a class="btn-link" href="clients.html">Mijozlar</a></li>
                         <li><a class="btn-link active-link" href="packages.html">Paketlar</a></li>
                         <li><a class="btn-link" href="bookings.html">Bronlar</a></li>
-                        <li><a class="btn-link" href="index.html">SAYTGA QAYTISH</a></li>
+                        <li><a class="btn-link" href="index.html">Saytga qaytish</a></li>
                     </ul>
                 </nav>
-                <div class="sidebar-footer"><button id="logout" class="btn btn-secondary">Chiqish</button></div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="avatar avatar-large">A</div>
+                    <div>
+                        <strong id="last-user">-</strong>
+                        <p class="small-text">Faol sessiya</p>
+                    </div>
+                </div>
+                <button id="logout" class="btn btn-secondary">Chiqish</button>
             </div>
         </aside>
 
         <main class="dashboard-root">
             <div class="container">
-                <header class="dashboard-header">
-                    <div>
+                <section class="dashboard-hero card">
+                    <div class="dashboard-hero-copy">
+                        <span class="eyebrow">Packages overview</span>
                         <h1>Paketlar</h1>
-                        <p class="small-text">Paketlar ro'yxati va tahrirlash</p>
+                        <p class="small-text">Har bir tur paketi narxi, davomiyligi va yo'nalishi bo'yicha boshqariladi.</p>
+                        <div class="dashboard-tools">
+                            <button id="add-package" class="btn btn-primary">Paket qo'shish</button>
+                            <button id="dashboard-new-booking" class="btn btn-secondary" type="button">Yangi bron</button>
+                        </div>
                     </div>
-                </header>
+                    <div class="dashboard-hero-stats">
+                        <article class="stat-tile">
+                            <span class="stat-label">Jami paketlar</span>
+                            <strong id="packages-count">0</strong>
+                        </article>
+                        <article class="stat-tile">
+                            <span class="stat-label">O'rtacha narx</span>
+                            <strong id="packages-average-price">$0</strong>
+                        </article>
+                        <article class="stat-tile">
+                            <span class="stat-label">Eng qimmat</span>
+                            <strong id="packages-premium">$0</strong>
+                        </article>
+                        <article class="stat-tile stat-tile-accent">
+                            <span class="stat-label">Top yo'nalish</span>
+                            <strong id="packages-top-destination">-</strong>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="dashboard-overview">
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Eng arzon paket</span>
+                            <strong id="packages-budget">$0</strong>
+                        </div>
+                        <p class="small-text">Mijozlar uchun kirish narxli variant</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Davomiylik</span>
+                            <strong id="packages-average-duration">0 kun</strong>
+                        </div>
+                        <p class="small-text">Paketlar bo'yicha o'rtacha safar muddati</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Faol yo'nalishlar</span>
+                            <strong id="packages-active-destinations">0</strong>
+                        </div>
+                        <p class="small-text">Alohida manzillar soni</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Tanlovdagi paket</span>
+                            <strong id="packages-featured">-</strong>
+                        </div>
+                        <p class="small-text">Ayni paytda tavsiya etilayotgan paket</p>
+                    </article>
+                </section>
+
+                <section class="dashboard-grid">
+                    <article class="dashboard-panel-card">
+                        <div class="section-header compact-header">
+                            <div>
+                                <span class="eyebrow">Paketlar ko'rinishi</span>
+                                <h2>Highlight</h2>
+                            </div>
+                        </div>
+                        <div id="packages-highlights" class="activity-list"></div>
+                    </article>
+
+                    <article class="dashboard-panel-card">
+                        <div class="section-header compact-header">
+                            <div>
+                                <span class="eyebrow">Strategiya</span>
+                                <h2>Narxlar paneli</h2>
+                            </div>
+                        </div>
+                        <div class="insight-box">
+                            <h3>Portfelni boshqarish</h3>
+                            <p class="small-text">Paketlarni tartiblab, mavzuga mos rasm va narx diapazonlari bilan boshqarish mumkin.</p>
+                        </div>
+                    </article>
+                </section>
 
                 <section>
-                    <div class="panel-actions">
-                        <button id="add-package" class="btn btn-primary">Paket qo'shish</button>
+                    <div class="section-header compact-header">
+                        <div>
+                            <span class="eyebrow">Paketlar jadvali</span>
+                            <h2>To'liq ro'yxat</h2>
+                        </div>
                     </div>
                     <div id="packages-dashboard" class="table-responsive"></div>
                 </section>

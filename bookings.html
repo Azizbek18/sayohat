@@ -13,33 +13,127 @@
 <body>
     <div class="app-shell">
         <aside class="sidebar">
-            <div class="container">
+            <div class="sidebar-brand-block">
                 <div class="brand">Sayohat Admin</div>
+                <p class="small-text sidebar-tagline">Bronlar holati va jarayonlar boshqaruvi</p>
+            </div>
+            <div class="sidebar-nav-block">
                 <nav>
                     <ul class="sidebar-nav">
-                        <li><a class="btn-link" href="dashboard.html">Dashbord</a></li>
+                        <li><a class="btn-link" href="dashboard.html">Dashboard</a></li>
                         <li><a class="btn-link" href="clients.html">Mijozlar</a></li>
                         <li><a class="btn-link" href="packages.html">Paketlar</a></li>
                         <li><a class="btn-link active-link" href="bookings.html">Bronlar</a></li>
-                        <li><a class="btn-link" href="index.html">SAYTGA QAYTISH</a></li>
+                        <li><a class="btn-link" href="index.html">Saytga qaytish</a></li>
                     </ul>
                 </nav>
-                <div class="sidebar-footer"><button id="logout" class="btn btn-secondary">Chiqish</button></div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="avatar avatar-large">A</div>
+                    <div>
+                        <strong id="last-user">-</strong>
+                        <p class="small-text">Faol sessiya</p>
+                    </div>
+                </div>
+                <button id="logout" class="btn btn-secondary">Chiqish</button>
             </div>
         </aside>
 
         <main class="dashboard-root">
             <div class="container">
-                <header class="dashboard-header">
-                    <div>
+                <section class="dashboard-hero card">
+                    <div class="dashboard-hero-copy">
+                        <span class="eyebrow">Bookings overview</span>
                         <h1>Bronlar</h1>
-                        <p class="small-text">Bronlar ro'yxati va holatini boshqarish</p>
+                        <p class="small-text">Bron holati, tasdiqlash jarayoni va mijozlar harakati shu yerda boshqariladi.</p>
+                        <div class="dashboard-tools">
+                            <button id="add-booking" class="btn btn-primary">Bron qo'shish</button>
+                            <button id="dashboard-new-booking" class="btn btn-secondary" type="button">Tezkor bron</button>
+                        </div>
                     </div>
-                </header>
+                    <div class="dashboard-hero-stats">
+                        <article class="stat-tile">
+                            <span class="stat-label">Jami bronlar</span>
+                            <strong id="bookings-count">0</strong>
+                        </article>
+                        <article class="stat-tile">
+                            <span class="stat-label">Kutmoqda</span>
+                            <strong id="bookings-pending">0</strong>
+                        </article>
+                        <article class="stat-tile">
+                            <span class="stat-label">Tasdiqlangan</span>
+                            <strong id="bookings-confirmed">0</strong>
+                        </article>
+                        <article class="stat-tile stat-tile-accent">
+                            <span class="stat-label">Rad etilgan</span>
+                            <strong id="bookings-rejected">0</strong>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="dashboard-overview">
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Oxirgi bron</span>
+                            <strong id="bookings-latest">-</strong>
+                        </div>
+                        <p class="small-text">So'nggi qo'shilgan bron haqida ma'lumot</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Eng faol yo'nalish</span>
+                            <strong id="bookings-top-destination">-</strong>
+                        </div>
+                        <p class="small-text">Bronlar soniga ko'ra yetakchi yo'nalish</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Taxminiy tushum</span>
+                            <strong id="bookings-revenue">$0</strong>
+                        </div>
+                        <p class="small-text">Tasdiqlangan va kutayotgan bronlar asosida</p>
+                    </article>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Faol mijozlar</span>
+                            <strong id="bookings-active-clients">0</strong>
+                        </div>
+                        <p class="small-text">Bron qilgan noyob mijozlar soni</p>
+                    </article>
+                </section>
+
+                <section class="dashboard-grid">
+                    <article class="dashboard-panel-card">
+                        <div class="section-header compact-header">
+                            <div>
+                                <span class="eyebrow">Status oqimi</span>
+                                <h2>Bron holati</h2>
+                            </div>
+                        </div>
+                        <div id="bookings-highlights" class="activity-list"></div>
+                    </article>
+
+                    <article class="dashboard-panel-card">
+                        <div class="section-header compact-header">
+                            <div>
+                                <span class="eyebrow">Operatsiya</span>
+                                <h2>Boshqaruv eslatmasi</h2>
+                            </div>
+                        </div>
+                        <div class="insight-box">
+                            <h3>Jarayonni kuzatish</h3>
+                            <p class="small-text">Har bir bronni tahrirlash, tasdiqlash yoki bekor qilish uchun shu paneldan foydalaning.</p>
+                        </div>
+                    </article>
+                </section>
 
                 <section>
-                    <div class="panel-actions">
-                        <button id="add-booking" class="btn btn-primary">Bron qo'shish</button>
+                    <div class="section-header compact-header">
+                        <div>
+                            <span class="eyebrow">Bronlar jadvali</span>
+                            <h2>To'liq ro'yxat</h2>
+                        </div>
                     </div>
                     <div id="bookings-list" class="table-responsive"></div>
                 </section>

@@ -5,6 +5,7 @@ const bookingsKey = "sayohat_bookings";
 const supabaseUrl = "https://nwjqvgqydrjkveievogo.supabase.co";
 const supabaseKey = "sb_publishable_WaZvU4qjGkSQu2Vd1qZujw_RcPZfqAh";
 const supabaseTable = "sayohat";
+const supabaseEmployeesTable = "sayohat_employees";
 const supabaseHeaders = {
     apikey: supabaseKey,
     Authorization: `Bearer ${supabaseKey}`,
@@ -68,6 +69,7 @@ const bookingsListEl = document.getElementById("bookings-list");
 const addClientBtn = document.getElementById("add-client");
 const addPackageBtn = document.getElementById("add-package");
 const addBookingBtn = document.getElementById("add-booking");
+const dashboardNewBookingBtn = document.getElementById("dashboard-new-booking");
 
 const tabButtons = document.querySelectorAll(".tab-btn");
 const tabContents = document.querySelectorAll(".tab-content");
@@ -129,6 +131,150 @@ async function saveBookingToSupabase(bookingRow) {
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || "Supabasega saqlab bo'lmadi");
+    }
+
+    return response.json();
+}
+
+async function hashPassword(password) {
+    if (!globalThis.crypto?.subtle) return password;
+
+    const encoded = new TextEncoder().encode(password);
+    const digest = await crypto.subtle.digest("SHA-256", encoded);
+    return Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+function passwordMatches(inputPassword, storedPassword) {
+    return inputPassword === storedPassword || false;
+}
+
+async function employeePasswordMatches(inputPassword, storedPassword) {
+    if (passwordMatches(inputPassword, storedPassword)) return true;
+    const hashed = await hashPassword(inputPassword);
+    return hashed === storedPassword;
+}
+
+async function fetchEmployeeByEmailFromSupabase(email) {
+    const response = await fetch(
+        `${supabaseUrl}/rest/v1/${supabaseEmployeesTable}?email=eq.${encodeURIComponent(email)}&select=*`,
+        {
+            method: "GET",
+            headers: supabaseHeaders,
+        }
+    );
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Supabase'dan xodimni olishda xatolik");
+    }
+
+    const rows = await response.json();
+    return rows?.[0] || null;
+}
+
+async function saveEmployeeToSupabase(employeeRow) {
+    const response = await fetch(`${supabaseUrl}/rest/v1/${supabaseEmployeesTable}`, {
+        method: "POST",
+        headers: {
+            ...supabaseHeaders,
+            Prefer: "return=representation",
+        },
+        body: JSON.stringify(employeeRow),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Xodimni Supabasega saqlab bo'lmadi");
+    }
+
+    return response.json();
+}
+
+async function updateEmployeeInSupabase(id, employeeRow) {
+    const response = await fetch(`${supabaseUrl}/rest/v1/${supabaseEmployeesTable}?id=eq.${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: {
+            ...supabaseHeaders,
+            Prefer: "return=representation",
+        },
+        body: JSON.stringify(employeeRow),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Demo xodimni yangilab bo'lmadi");
+    }
+
+    return response.json();
+}
+
+async function ensureDefaultEmployeeOnSupabase() {
+    const demoEmail = "demo@mail.com";
+    const demoPlainPassword = "123456";
+    const hashedDemoPassword = await hashPassword(demoPlainPassword);
+    const localEmployees = getEmployees();
+    const demoLocalIndex = localEmployees.findIndex((employee) => employee.email === demoEmail);
+
+    const demoLocalRecord = {
+        id: "e_demo",
+        name: "demo",
+        email: demoEmail,
+        password: hashedDemoPassword,
+    };
+
+    if (demoLocalIndex >= 0) {
+        localEmployees[demoLocalIndex] = { ...localEmployees[demoLocalIndex], ...demoLocalRecord };
+    } else {
+        localEmployees.push(demoLocalRecord);
+    }
+
+    writeStorage(employeesKey, localEmployees);
+
+    try {
+        const remoteDemo = await fetchEmployeeByEmailFromSupabase(demoEmail);
+        if (remoteDemo?.id) {
+            const remotePassword = remoteDemo.password || "";
+            if (!(await employeePasswordMatches(demoPlainPassword, remotePassword))) {
+                await updateEmployeeInSupabase(remoteDemo.id, {
+                    name: "demo",
+                    email: demoEmail,
+                    password: hashedDemoPassword,
+                    source: "sayohat-web",
+                });
+            }
+            return;
+        }
+
+        await saveEmployeeToSupabase({
+            id: "e_demo",
+            name: "demo",
+            email: demoEmail,
+            password: hashedDemoPassword,
+            source: "sayohat-web",
+        });
+    } catch (error) {
+        console.warn("Demo employee sync failed:", error);
+    }
+}
+
+function mergeEmployeesByEmail(existingEmployees, nextEmployee) {
+    const normalizedEmail = nextEmployee.email.toLowerCase();
+    const updated = existingEmployees.filter((employee) => employee.email.toLowerCase() !== normalizedEmail);
+    updated.push(nextEmployee);
+    return updated;
+}
+
+async function fetchBookingsFromSupabase() {
+    const response = await fetch(`${supabaseUrl}/rest/v1/${supabaseTable}?select=*`, {
+        method: "GET",
+        headers: supabaseHeaders,
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Supabase'dan bronlarni olishda xatolik");
     }
 
     return response.json();
@@ -199,6 +345,378 @@ function getPackageById(id) {
     return getPackages().find((item) => item.id === id);
 }
 
+function ensureClientForBookingRow(row) {
+    const clients = getClients();
+    const normalizedEmail = (row.email || "").trim().toLowerCase();
+    const existingClient = clients.find((client) => client.email.toLowerCase() === normalizedEmail);
+
+    if (existingClient) {
+        const nextClient = {
+            ...existingClient,
+            name: row.name || existingClient.name,
+            phone: row.phone || existingClient.phone,
+            note: row.note || existingClient.note,
+        };
+        const updated = clients.map((client) => (client.id === existingClient.id ? nextClient : client));
+        writeStorage(clientsKey, updated);
+        return nextClient;
+    }
+
+    const newClient = {
+        id: createId("c"),
+        name: row.name || "Noma'lum mijoz",
+        email: normalizedEmail || `guest-${Date.now()}@sayohat.local`,
+        phone: row.phone || "",
+        note: row.note || "",
+    };
+    writeStorage(clientsKey, [...clients, newClient]);
+    return newClient;
+}
+
+function normalizeSupabaseBookingRow(row) {
+    const client = ensureClientForBookingRow(row);
+    const packageMatch =
+        getPackages().find((pkg) => String(pkg.id) === String(row.package_id)) ||
+        getPackages().find((pkg) => pkg.name === row.package_name) ||
+        null;
+
+    return {
+        id: row.id ? `b_supabase_${row.id}` : createId("b"),
+        clientId: client.id,
+        packageId: packageMatch?.id || row.package_id || "",
+        status: row.status || "Kutmoqda",
+        supabaseId: row.id || null,
+        source: row.source || "sayohat-web",
+        note: row.note || "",
+        importedFromSupabase: true,
+    };
+}
+
+function mergeBookings(existingBookings, incomingBookings) {
+    const merged = [...existingBookings];
+
+    incomingBookings.forEach((incoming) => {
+        const existingIndex = merged.findIndex(
+            (booking) =>
+                (booking.supabaseId && incoming.supabaseId && String(booking.supabaseId) === String(incoming.supabaseId)) ||
+                (booking.clientId === incoming.clientId && booking.packageId === incoming.packageId && booking.status === incoming.status && !booking.supabaseId)
+        );
+
+        if (existingIndex >= 0) {
+            merged[existingIndex] = {
+                ...merged[existingIndex],
+                ...incoming,
+                id: merged[existingIndex].id || incoming.id,
+            };
+            return;
+        }
+
+        merged.push(incoming);
+    });
+
+    return merged;
+}
+
+async function syncBookingsFromSupabase() {
+    try {
+        const remoteRows = await fetchBookingsFromSupabase();
+        const importedBookings = remoteRows.map(normalizeSupabaseBookingRow);
+        const localBookings = getBookings();
+        const mergedBookings = mergeBookings(localBookings, importedBookings);
+        writeStorage(bookingsKey, mergedBookings);
+        return mergedBookings;
+    } catch (error) {
+        console.warn("Supabase booking sync failed:", error);
+        return getBookings();
+    }
+}
+
+function getBookingStatusSummary() {
+    return getBookings().reduce(
+        (summary, booking) => {
+            if (booking.status === "Tasdiqlangan") summary.confirmed += 1;
+            else if (booking.status === "Rad etilgan") summary.rejected += 1;
+            else summary.pending += 1;
+            return summary;
+        },
+        { pending: 0, confirmed: 0, rejected: 0 }
+    );
+}
+
+function getTopDestination() {
+    const destinations = getPopularDestinations();
+    return destinations.find((item) => item.count > 0) || destinations[0] || null;
+}
+
+function parseDurationDays(duration = "") {
+    const match = String(duration).match(/(\d+)/);
+    return match ? Number(match[1]) : 0;
+}
+
+function renderMetricHighlights(containerId, items) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    el.innerHTML = items
+        .map(
+            (item) => `
+                <article class="activity-item activity-${item.tone || "neutral"}">
+                    <span class="activity-dot"></span>
+                    <div>
+                        <h3>${item.title}</h3>
+                        <p class="small-text">${item.meta}</p>
+                    </div>
+                </article>`
+        )
+        .join("");
+}
+
+function renderClientsPageDetails() {
+    const clients = getClients();
+    const bookings = getBookings();
+    const clientBookingCounts = bookings.reduce((accumulator, booking) => {
+        accumulator[booking.clientId] = (accumulator[booking.clientId] || 0) + 1;
+        return accumulator;
+    }, {});
+
+    const latestClient = clients[clients.length - 1] || null;
+    const topClientEntry = Object.entries(clientBookingCounts).sort((a, b) => b[1] - a[1])[0] || null;
+    const topClient = topClientEntry ? clients.find((client) => client.id === topClientEntry[0]) : null;
+
+    const clientsWithBookings = clients.filter((client) => (clientBookingCounts[client.id] || 0) > 0).length;
+    const clientsWithNotes = clients.filter((client) => (client.note || "").trim()).length;
+    const activeContacts = clients.filter((client) => client.email && client.phone).length;
+    const averageBookings = clients.length ? (bookings.length / clients.length).toFixed(1) : "0.0";
+
+    const latestClientEl = document.getElementById("latest-client");
+    if (latestClientEl) latestClientEl.textContent = latestClient ? latestClient.name : "-";
+
+    const bookedClientsEl = document.getElementById("clients-booked");
+    if (bookedClientsEl) bookedClientsEl.textContent = String(clientsWithBookings);
+
+    const notedClientsEl = document.getElementById("clients-noted");
+    if (notedClientsEl) notedClientsEl.textContent = String(clientsWithNotes);
+
+    const avgBookingsEl = document.getElementById("clients-average-bookings");
+    if (avgBookingsEl) avgBookingsEl.textContent = averageBookings;
+
+    const activeContactsEl = document.getElementById("clients-active-contacts");
+    if (activeContactsEl) activeContactsEl.textContent = String(activeContacts);
+
+    const clientsWithBookingsEl = document.getElementById("clients-with-bookings");
+    if (clientsWithBookingsEl) clientsWithBookingsEl.textContent = String(clientsWithBookings);
+
+    const topClientEl = document.getElementById("top-client");
+    if (topClientEl) topClientEl.textContent = topClient ? topClient.name : "-";
+
+    renderMetricHighlights("clients-highlights", [
+        {
+            title: "Eng faol mijoz",
+            meta: topClient ? `${topClient.name} - ${clientBookingCounts[topClient.id]} ta bron` : "Hozircha faol mijoz yo'q",
+            tone: "accent",
+        },
+        {
+            title: "Oxirgi qo'shilgan mijoz",
+            meta: latestClient ? `${latestClient.name} · ${latestClient.email}` : "Mijoz yo'q",
+            tone: "info",
+        },
+        {
+            title: "Izohli kontaktlar",
+            meta: `${clientsWithNotes} ta mijozda qo'shimcha izoh mavjud`,
+            tone: "success",
+        },
+        {
+            title: "Aloqa sifati",
+            meta: `${activeContacts} ta mijozda email va telefon to'liq`,
+            tone: "neutral",
+        },
+    ]);
+}
+
+function renderPackagesPageDetails() {
+    const packages = getPackages();
+    const bookings = getBookings();
+    const topDestination = getTopDestination();
+
+    const averagePrice = packages.length
+        ? Math.round(packages.reduce((total, pkg) => total + Number(pkg.price || 0), 0) / packages.length)
+        : 0;
+    const maxPackage = packages.reduce((current, pkg) => (!current || Number(pkg.price) > Number(current.price) ? pkg : current), null);
+    const minPackage = packages.reduce((current, pkg) => (!current || Number(pkg.price) < Number(current.price) ? pkg : current), null);
+    const averageDuration = packages.length
+        ? Math.round(packages.reduce((total, pkg) => total + parseDurationDays(pkg.duration), 0) / packages.length)
+        : 0;
+    const activeDestinations = new Set(packages.map((pkg) => pkg.destination).filter(Boolean)).size;
+    const featuredPackage = packages
+        .slice()
+        .sort((a, b) => Number(b.price) - Number(a.price))[0];
+
+    const averagePriceEl = document.getElementById("packages-average-price");
+    if (averagePriceEl) averagePriceEl.textContent = `$${averagePrice}`;
+
+    const premiumEl = document.getElementById("packages-premium");
+    if (premiumEl) premiumEl.textContent = maxPackage ? `$${maxPackage.price}` : "$0";
+
+    const topDestinationEl = document.getElementById("packages-top-destination");
+    if (topDestinationEl) topDestinationEl.textContent = topDestination ? topDestination.destination : "-";
+
+    const budgetEl = document.getElementById("packages-budget");
+    if (budgetEl) budgetEl.textContent = minPackage ? `$${minPackage.price}` : "$0";
+
+    const avgDurationEl = document.getElementById("packages-average-duration");
+    if (avgDurationEl) avgDurationEl.textContent = `${averageDuration} kun`;
+
+    const activeDestinationsEl = document.getElementById("packages-active-destinations");
+    if (activeDestinationsEl) activeDestinationsEl.textContent = String(activeDestinations);
+
+    const featuredEl = document.getElementById("packages-featured");
+    if (featuredEl) featuredEl.textContent = featuredPackage ? featuredPackage.name : "-";
+
+    renderMetricHighlights("packages-highlights", [
+        {
+            title: "Premium paket",
+            meta: maxPackage ? `${maxPackage.name} · $${maxPackage.price}` : "Ma'lumot yo'q",
+            tone: "accent",
+        },
+        {
+            title: "Eng tejamkor variant",
+            meta: minPackage ? `${minPackage.name} · $${minPackage.price}` : "Ma'lumot yo'q",
+            tone: "success",
+        },
+        {
+            title: "O'rtacha narx",
+            meta: `${packages.length} ta paket uchun o'rtacha $${averagePrice}`,
+            tone: "info",
+        },
+        {
+            title: "Mavjud yo'nalishlar",
+            meta: `${activeDestinations} ta alohida yo'nalish qamrab olingan`,
+            tone: "neutral",
+        },
+    ]);
+}
+
+function renderBookingsPageDetails() {
+    const bookings = getBookings();
+    const clients = getClients();
+    const statusSummary = getBookingStatusSummary();
+    const topDestination = getTopDestination();
+    const latestBooking = bookings[bookings.length - 1] || null;
+    const activeClients = new Set(bookings.map((booking) => booking.clientId)).size;
+    const revenue = bookings.reduce((total, booking) => {
+        if (booking.status === "Rad etilgan") return total;
+        const pkg = getPackageById(booking.packageId);
+        return total + Number(pkg?.price || 0);
+    }, 0);
+
+    const latestBookingText = latestBooking
+        ? `${getClientById(latestBooking.clientId)?.name || "Mijoz"} · ${getPackageById(latestBooking.packageId)?.name || "Paket"}`
+        : "-";
+
+    const latestBookingEl = document.getElementById("bookings-latest");
+    if (latestBookingEl) latestBookingEl.textContent = latestBookingText;
+
+    const pendingEl = document.getElementById("bookings-pending");
+    if (pendingEl) pendingEl.textContent = String(statusSummary.pending);
+
+    const confirmedEl = document.getElementById("bookings-confirmed");
+    if (confirmedEl) confirmedEl.textContent = String(statusSummary.confirmed);
+
+    const rejectedEl = document.getElementById("bookings-rejected");
+    if (rejectedEl) rejectedEl.textContent = String(statusSummary.rejected);
+
+    const revenueEl = document.getElementById("bookings-revenue");
+    if (revenueEl) revenueEl.textContent = `$${revenue}`;
+
+    const activeClientsEl = document.getElementById("bookings-active-clients");
+    if (activeClientsEl) activeClientsEl.textContent = String(activeClients);
+
+    const topDestinationEl = document.getElementById("bookings-top-destination");
+    if (topDestinationEl) topDestinationEl.textContent = topDestination ? topDestination.destination : "-";
+
+    renderMetricHighlights("bookings-highlights", [
+        {
+            title: "Kutayotganlar",
+            meta: `${statusSummary.pending} ta bron tasdiqlanishni kutmoqda`,
+            tone: "accent",
+        },
+        {
+            title: "Tasdiqlanganlar",
+            meta: `${statusSummary.confirmed} ta bron faol holatda`,
+            tone: "success",
+        },
+        {
+            title: "So'nggi bron",
+            meta: latestBookingText,
+            tone: "info",
+        },
+        {
+            title: "Faol mijozlar",
+            meta: `${activeClients} ta noyob mijoz bron qilgan`,
+            tone: "neutral",
+        },
+    ]);
+}
+
+function renderRecentActivity() {
+    const activityEl = document.getElementById("recent-activity");
+    if (!activityEl) return;
+
+    const bookings = getBookings();
+    const clients = getClients();
+    const packages = getPackages();
+    const currentEmployee = authState.currentEmployee || readStorage("sayohat_current_employee", null);
+    const topDestination = getTopDestination();
+
+    const items = [];
+
+    if (currentEmployee) {
+        items.push({
+            title: "Faol sessiya",
+            meta: `${currentEmployee.name} tizimga kirgan`,
+            tone: "success",
+        });
+    }
+
+    if (topDestination) {
+        items.push({
+            title: "Eng ommabop yo'nalish",
+            meta: `${topDestination.destination} bo'yicha ${topDestination.count} ta bron`,
+            tone: "accent",
+        });
+    }
+
+    const latestBooking = bookings[bookings.length - 1];
+    if (latestBooking) {
+        const client = getClientById(latestBooking.clientId);
+        const pkg = getPackageById(latestBooking.packageId);
+        items.push({
+            title: "So'nggi bron",
+            meta: `${client?.name || "Mijoz"} · ${pkg?.name || "Paket"} · ${latestBooking.status}`,
+            tone: "info",
+        });
+    }
+
+    items.push({
+        title: "Tizim holati",
+        meta: `${clients.length} mijoz va ${packages.length} paket faol`,
+        tone: "neutral",
+    });
+
+    activityEl.innerHTML = items
+        .map(
+            (item) => `
+                <article class="activity-item activity-${item.tone}">
+                    <span class="activity-dot"></span>
+                    <div>
+                        <h3>${item.title}</h3>
+                        <p class="small-text">${item.meta}</p>
+                    </div>
+                </article>`
+        )
+        .join("");
+}
+
 // Dashboard state helpers
 function setActiveTab(tabId) {
     tabButtons.forEach((btn) => {
@@ -217,17 +735,19 @@ function showDashboard() {
     setActiveTab("clients");
 
     const employeeName = authState.currentEmployee?.name || "Xodim";
-    const headerTitle = panelEl.querySelector(".dashboard-header h1") || panelEl.querySelector(".dashboard-panel-header h2");
+    const headerTitle =
+        panelEl.querySelector(".dashboard-hero h1") ||
+        panelEl.querySelector(".dashboard-header h1") ||
+        panelEl.querySelector(".dashboard-panel-header h2");
     if (headerTitle) {
         headerTitle.textContent = `${employeeName} - Admin Panel`;
     }
 
     renderDashboard();
 
-    const avatarEl = document.querySelector(".avatar");
-    if (avatarEl) {
+    document.querySelectorAll(".avatar").forEach((avatarEl) => {
         avatarEl.textContent = (employeeName || "A").trim().charAt(0).toUpperCase();
-    }
+    });
 }
 
 function hideDashboard() {
@@ -430,15 +950,55 @@ function renderDashboard() {
     renderPackagesDashboard();
     renderBookings();
     renderDestinations();
+    renderRecentActivity();
+    renderClientsPageDetails();
+    renderPackagesPageDetails();
+    renderBookingsPageDetails();
+
+    const bookings = getBookings();
+    const packages = getPackages();
+    const clients = getClients();
+    const statusSummary = getBookingStatusSummary();
+    const topDestination = getTopDestination();
 
     const clientsCountEl = document.getElementById("clients-count");
-    if (clientsCountEl) clientsCountEl.textContent = String(getClients().length);
+    if (clientsCountEl) clientsCountEl.textContent = String(clients.length);
 
     const packagesCountEl = document.getElementById("packages-count");
-    if (packagesCountEl) packagesCountEl.textContent = String(getPackages().length);
+    if (packagesCountEl) packagesCountEl.textContent = String(packages.length);
 
     const bookingsCountEl = document.getElementById("bookings-count");
-    if (bookingsCountEl) bookingsCountEl.textContent = String(getBookings().length);
+    if (bookingsCountEl) bookingsCountEl.textContent = String(bookings.length);
+
+    const pendingBookingsEl = document.getElementById("pending-bookings");
+    if (pendingBookingsEl) pendingBookingsEl.textContent = String(statusSummary.pending);
+
+    const confirmedBookingsEl = document.getElementById("confirmed-bookings");
+    if (confirmedBookingsEl) confirmedBookingsEl.textContent = String(statusSummary.confirmed);
+
+    const estimatedRevenueEl = document.getElementById("estimated-revenue");
+    if (estimatedRevenueEl) {
+        const revenue = bookings.reduce((total, booking) => {
+            if (booking.status === "Rad etilgan") return total;
+            const pkg = getPackageById(booking.packageId);
+            return total + Number(pkg?.price || 0);
+        }, 0);
+        estimatedRevenueEl.textContent = `$${revenue}`;
+    }
+
+    const activeDestinationsEl = document.getElementById("active-destinations");
+    if (activeDestinationsEl) {
+        const uniqueDestinations = new Set(
+            bookings
+                .filter((booking) => booking.status !== "Rad etilgan")
+                .map((booking) => getPackageById(booking.packageId)?.destination)
+                .filter(Boolean)
+        );
+        activeDestinationsEl.textContent = String(uniqueDestinations.size);
+    }
+
+    const topDestinationEl = document.getElementById("top-destination");
+    if (topDestinationEl) topDestinationEl.textContent = topDestination ? topDestination.destination : "-";
 
     const lastUserEl = document.getElementById("last-user");
     const currentEmployee = authState.currentEmployee || readStorage("sayohat_current_employee", null);
@@ -474,7 +1034,7 @@ function renderAuthModal(mode) {
     }
 
     modalTitle.textContent = "Xodim kirishi";
-    authHelp.innerHTML = "Demo uchun: Email: <code>demo@mail.com</code> | Parol: <code>123456</code>";
+    authHelp.innerHTML = "Demo uchun: Email: <code>demo@mail.com</code> | Parol: <code>123456</code>. Bu kirish har doim ishlaydi.";
 }
 
 function renderBookingModal(pkg) {
@@ -768,21 +1328,8 @@ function renderCustomerBookings(email) {
 }
 
 // Initial data
-function setupInitialData() {
-    const demoEmail = "demo@mail.com";
-    const demoPassword = "123456";
-    const employees = getEmployees();
-    const demoIndex = employees.findIndex((employee) => employee.email === demoEmail);
-
-    if (demoIndex >= 0) {
-        if (employees[demoIndex].password !== demoPassword) {
-            employees[demoIndex].password = demoPassword;
-        }
-    } else {
-        employees.push({ id: "e_demo", name: "demo", email: demoEmail, password: demoPassword });
-    }
-
-    writeStorage(employeesKey, employees);
+async function setupInitialData() {
+    await ensureDefaultEmployeeOnSupabase();
 
     if (!localStorage.getItem(packagesKey) || getPackages().length < 10) {
         writeStorage(packagesKey, initialPackages);
@@ -800,8 +1347,9 @@ function setupInitialData() {
     }
 }
 
-function init() {
+async function init() {
     setupInitialData();
+    await syncBookingsFromSupabase();
     renderPackages();
     renderDestinations();
 
@@ -878,38 +1426,129 @@ if (authForm) {
         const email = fields.emailInput?.value.trim().toLowerCase() || "";
         const name = fields.nameInput?.value.trim() || "";
         const password = fields.passwordInput?.value.trim() || "";
-        const employees = getEmployees();
-
+        const isDemoLogin = email === "demo@mail.com" && password === "123456";
         if (authState.mode === "register") {
-            if (employees.some((employee) => employee.email === email)) {
-                if (authHelp) authHelp.textContent = "Bu email bilan xodim allaqachon ro'yxatdan o'tgan.";
+            setAuthSubmitting(true, "Ro'yxatdan o'tkazilmoqda...");
+
+            try {
+                const existingRemoteEmployee = await fetchEmployeeByEmailFromSupabase(email);
+                if (existingRemoteEmployee) {
+                    if (authHelp) authHelp.textContent = "Bu email bilan xodim allaqachon ro'yxatdan o'tgan.";
+                    setAuthSubmitting(false);
+                    return;
+                }
+
+                const hashedPassword = await hashPassword(password);
+                const newEmployeeRow = {
+                    name,
+                    email,
+                    password: hashedPassword,
+                    source: "sayohat-web",
+                };
+                const insertedRows = await saveEmployeeToSupabase(newEmployeeRow);
+                const savedEmployee = insertedRows?.[0] || { ...newEmployeeRow, id: createId("e") };
+                const cachedEmployee = {
+                    id: savedEmployee.id || createId("e"),
+                    name: savedEmployee.name || name,
+                    email: savedEmployee.email || email,
+                    password: savedEmployee.password || hashedPassword,
+                    source: savedEmployee.source || "sayohat-web",
+                };
+
+                writeStorage(employeesKey, mergeEmployeesByEmail(getEmployees(), cachedEmployee));
+                authState.mode = "login";
+                renderAuthModal("login");
+                if (authHelp) authHelp.textContent = "Ro'yxatdan o'tish muvaffaqiyatli. Endi tizimga kirishingiz mumkin.";
+            } catch (error) {
+                console.error("Supabase employee register error:", error);
+                if (authHelp) authHelp.textContent = "Ro'yxatdan o'tkazishda xatolik yuz berdi. Qayta urinib ko'ring.";
+            } finally {
+                setAuthSubmitting(false);
+            }
+            return;
+        }
+
+        setAuthSubmitting(true, "Kirish tekshirilmoqda...");
+
+        try {
+            if (isDemoLogin) {
+                await ensureDefaultEmployeeOnSupabase();
+
+                const demoEmployee = getEmployees().find((employee) => employee.email.toLowerCase() === email) || {
+                    id: "e_demo",
+                    name: "demo",
+                    email,
+                    password: await hashPassword(password),
+                    source: "sayohat-web",
+                };
+
+                const cachedDemoEmployee = {
+                    id: demoEmployee.id || "e_demo",
+                    name: demoEmployee.name || "demo",
+                    email: demoEmployee.email || email,
+                    password: demoEmployee.password || (await hashPassword(password)),
+                    source: demoEmployee.source || "sayohat-web",
+                };
+
+                writeStorage(employeesKey, mergeEmployeesByEmail(getEmployees(), cachedDemoEmployee));
+                authState.currentEmployee = {
+                    id: cachedDemoEmployee.id,
+                    name: cachedDemoEmployee.name,
+                    email: cachedDemoEmployee.email,
+                };
+                writeStorage("sayohat_current_employee", authState.currentEmployee);
+
+                if (!location.pathname.includes("dashboard.html")) {
+                    window.location.href = "dashboard.html";
+                    return;
+                }
+
+                hideModal();
+                showDashboard();
                 return;
             }
 
-            const newEmployee = { id: createId("e"), name, email, password };
-            writeStorage(employeesKey, [...employees, newEmployee]);
-            authState.mode = "login";
-            renderAuthModal("login");
-            if (authHelp) authHelp.textContent = "Ro'yxatdan o'tish muvaffaqiyatli. Endi tizimga kirishingiz mumkin.";
-            return;
+            const remoteEmployee = await fetchEmployeeByEmailFromSupabase(email);
+            if (!remoteEmployee) {
+                if (authHelp) authHelp.textContent = "Bu email bilan xodim topilmadi. Avval ro'yxatdan o'ting.";
+                return;
+            }
+
+            const passwordOk = await employeePasswordMatches(password, remoteEmployee.password || "");
+            if (!passwordOk) {
+                if (authHelp) authHelp.textContent = "Email yoki parol noto'g'ri. Iltimos qayta urinib ko'ring.";
+                return;
+            }
+
+            const cachedEmployee = {
+                id: remoteEmployee.id || createId("e"),
+                name: remoteEmployee.name || name || remoteEmployee.email,
+                email: remoteEmployee.email || email,
+                password: remoteEmployee.password || "",
+                source: remoteEmployee.source || "sayohat-web",
+            };
+
+            writeStorage(employeesKey, mergeEmployeesByEmail(getEmployees(), cachedEmployee));
+            authState.currentEmployee = {
+                id: cachedEmployee.id,
+                name: cachedEmployee.name,
+                email: cachedEmployee.email,
+            };
+            writeStorage("sayohat_current_employee", authState.currentEmployee);
+
+            if (!location.pathname.includes("dashboard.html")) {
+                window.location.href = "dashboard.html";
+                return;
+            }
+
+            hideModal();
+            showDashboard();
+        } catch (error) {
+            console.error("Supabase employee login error:", error);
+            if (authHelp) authHelp.textContent = "Kirish vaqtida xatolik yuz berdi. Tarmoq va Supabase sozlamasini tekshiring.";
+        } finally {
+            setAuthSubmitting(false);
         }
-
-        const employee = employees.find((item) => item.email === email && item.password === password);
-        if (!employee) {
-            if (authHelp) authHelp.textContent = "Email yoki parol noto'g'ri. Iltimos qayta urinib ko'ring.";
-            return;
-        }
-
-        authState.currentEmployee = employee;
-        writeStorage("sayohat_current_employee", employee);
-
-        if (!location.pathname.includes("dashboard.html")) {
-            window.location.href = "dashboard.html";
-            return;
-        }
-
-        hideModal();
-        showDashboard();
     });
 
     authForm.addEventListener("click", (event) => {
@@ -959,6 +1598,13 @@ if (packageListEl) {
 if (addClientBtn) addClientBtn.addEventListener("click", () => showEditForm("client"));
 if (addPackageBtn) addPackageBtn.addEventListener("click", () => showEditForm("package"));
 if (addBookingBtn) addBookingBtn.addEventListener("click", () => showEditForm("booking"));
+if (dashboardNewBookingBtn) {
+    dashboardNewBookingBtn.addEventListener("click", () => {
+        const bookingsTabBtn = document.querySelector('[data-tab="bookings"]');
+        if (bookingsTabBtn) bookingsTabBtn.click();
+        showEditForm("booking");
+    });
+}
 
 if (closeEditModal) closeEditModal.addEventListener("click", hideEditModal);
 if (editModal) {

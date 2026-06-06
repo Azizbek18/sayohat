@@ -12,62 +12,127 @@
 <body>
     <div class="app-shell">
         <aside class="sidebar">
-            <div class="container">
+            <div class="sidebar-brand-block">
                 <div class="brand">Sayohat Admin</div>
+                <p class="small-text sidebar-tagline">Bronlar, paketlar va mijozlarni boshqarish markazi</p>
+            </div>
+            <div class="sidebar-nav-block">
                 <nav>
                     <ul class="sidebar-nav">
-                        <li><a class="btn-link active-link" href="dashboard.html">Dashbord</a></li>
+                        <li><a class="btn-link active-link" href="dashboard.html">Dashboard</a></li>
                         <li><a class="btn-link" href="clients.html">Mijozlar</a></li>
                         <li><a class="btn-link" href="packages.html">Paketlar</a></li>
                         <li><a class="btn-link" href="bookings.html">Bronlar</a></li>
                         <li><a class="btn-link" href="index.html">SAYTGA QAYTISH</a></li>
                     </ul>
                 </nav>
-                <div class="sidebar-footer">
-                    <button id="logout" class="btn btn-secondary">Chiqish</button>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="avatar avatar-large">A</div>
+                    <div>
+                        <strong id="last-user">-</strong>
+                        <p class="small-text">Faol sessiya</p>
+                    </div>
                 </div>
+                <button id="logout" class="btn btn-secondary">Chiqish</button>
             </div>
         </aside>
 
         <main class="dashboard-root">
             <div class="container">
-                <header class="dashboard-header">
-                    <div>
+                <section class="dashboard-hero card">
+                    <div class="dashboard-hero-copy">
+                        <span class="eyebrow">Live dashboard</span>
                         <h1>Admin panel</h1>
-                        <p class="small-text">Sayohat Agentligi boshqaruv paneli</p>
-                    </div>
-                    <div class="dashboard-tools">
-                        <input class="dashboard-search" placeholder="Qidirish..." />
-                        <div class="dashboard-meta">
-                            <div class="avatar">A</div>
+                        <p class="small-text">Sayohat Agentligi boshqaruv markazi. Mijozlar, paketlar va bronlar bir joyda.</p>
+                        <div class="dashboard-tools">
+                            <input class="dashboard-search" placeholder="Qidirish..." />
+                            <button id="dashboard-new-booking" class="btn btn-primary" type="button">Yangi bron</button>
                         </div>
                     </div>
-                </header>
+                    <div class="dashboard-hero-stats">
+                        <article class="stat-tile">
+                            <span class="stat-label">Mijozlar</span>
+                            <strong id="clients-count">0</strong>
+                        </article>
+                        <article class="stat-tile">
+                            <span class="stat-label">Paketlar</span>
+                            <strong id="packages-count">0</strong>
+                        </article>
+                        <article class="stat-tile">
+                            <span class="stat-label">Bronlar</span>
+                            <strong id="bookings-count">0</strong>
+                        </article>
+                        <article class="stat-tile stat-tile-accent">
+                            <span class="stat-label">Top yo'nalish</span>
+                            <strong id="top-destination">-</strong>
+                        </article>
+                    </div>
+                </section>
 
-                <section class="dashboard-widgets">
-                    <article class="card">
-                        <h3>Mijozlar</h3>
-                        <p class="small-text">Jami mijozlar</p>
-                        <div class="widget-value"><span id="clients-count">0</span></div>
+                <section class="dashboard-overview">
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Kutilayotgan bronlar</span>
+                            <strong id="pending-bookings">0</strong>
+                        </div>
+                        <p class="small-text">Tasdiqlashni kutayotgan bronlar soni</p>
                     </article>
-                    <article class="card">
-                        <h3>Paketlar</h3>
-                        <p class="small-text">Jami paketlar</p>
-                        <div class="widget-value"><span id="packages-count">0</span></div>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Tasdiqlangan bronlar</span>
+                            <strong id="confirmed-bookings">0</strong>
+                        </div>
+                        <p class="small-text">Faol va tasdiqlangan buyurtmalar</p>
                     </article>
-                    <article class="card">
-                        <h3>Bronlar</h3>
-                        <p class="small-text">Jami bronlar</p>
-                        <div class="widget-value"><span id="bookings-count">0</span></div>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Taxminiy aylanish</span>
+                            <strong id="estimated-revenue">$0</strong>
+                        </div>
+                        <p class="small-text">Bronlar asosidagi taxminiy tushum</p>
                     </article>
-                    <article class="card">
-                        <h3>So'ngi foydalanuvchi</h3>
-                        <p class="small-text">Tizimga oxirgi kirgan</p>
-                        <div class="widget-subtitle" id="last-user">-</div>
+                    <article class="overview-card">
+                        <div>
+                            <span class="overview-label">Faol yo'nalishlar</span>
+                            <strong id="active-destinations">0</strong>
+                        </div>
+                        <p class="small-text">Bron bo'lgan alohida yo'nalishlar</p>
                     </article>
                 </section>
 
-                <section>
+                <section class="dashboard-grid">
+                    <article class="dashboard-panel-card">
+                        <div class="section-header compact-header">
+                            <div>
+                                <span class="eyebrow">Tezkor amallar</span>
+                                <h2>Panel boshqaruvi</h2>
+                            </div>
+                        </div>
+                        <div class="quick-actions">
+                            <button id="add-client" class="btn btn-secondary">Mijoz qo'shish</button>
+                            <button id="add-package" class="btn btn-secondary">Paket qo'shish</button>
+                            <button id="add-booking" class="btn btn-primary">Bron qo'shish</button>
+                        </div>
+                        <div class="insight-box">
+                            <h3>Bugungi holat</h3>
+                            <p class="small-text">Yangi mijozlar, bronlar va paketlar shu panelda tezda boshqariladi.</p>
+                        </div>
+                    </article>
+
+                    <article class="dashboard-panel-card">
+                        <div class="section-header compact-header">
+                            <div>
+                                <span class="eyebrow">Aktivlik</span>
+                                <h2>So'nggi harakatlar</h2>
+                            </div>
+                        </div>
+                        <div id="recent-activity" class="activity-list"></div>
+                    </article>
+                </section>
+
+                <section class="dashboard-main-tabs">
                     <div class="tabs">
                         <button class="tab-btn active" data-tab="clients">Mijozlar</button>
                         <button class="tab-btn" data-tab="packages">Paketlar</button>
@@ -75,23 +140,14 @@
                     </div>
 
                     <div class="tab-content active" id="clients-tab">
-                        <div class="panel-actions">
-                            <button id="add-client" class="btn btn-primary">Mijoz qo'shish</button>
-                        </div>
                         <div id="clients-list" class="table-responsive"></div>
                     </div>
 
                     <div class="tab-content" id="packages-tab">
-                        <div class="panel-actions">
-                            <button id="add-package" class="btn btn-primary">Paket qo'shish</button>
-                        </div>
                         <div id="packages-dashboard" class="table-responsive"></div>
                     </div>
 
                     <div class="tab-content" id="bookings-tab">
-                        <div class="panel-actions">
-                            <button id="add-booking" class="btn btn-primary">Bron qo'shish</button>
-                        </div>
                         <div id="bookings-list" class="table-responsive"></div>
                     </div>
                 </section>
